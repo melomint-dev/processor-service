@@ -3,7 +3,6 @@ fastapi
 pymongo
 python-multipart
 tensorflow
-tensorflow-gpu
 tensorflow_hub
 numpy
 librosa

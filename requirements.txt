@@ -1,0 +1,6 @@
+fastapi
+tensorflow
+tensorflow_hub
+numpy
+librosa
+sklearn

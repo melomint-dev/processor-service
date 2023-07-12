@@ -1,3 +1,4 @@
+from typing import List, Dict
 import tensorflow as tf
 import tensorflow_hub as hub
 import numpy as np
@@ -75,7 +76,9 @@ def calculate_similarity_matrix(embeddings1, embeddings2):
 #         # print(similarity_matrix.shape)
 
 
-def getEmbeddings(music):
+def get_embeddings_and_calculate_similarity_with_prev_songs(
+    current_song_filename: str, prev_songs_data: List[Dict[str, any]]
+):
     tf.compat.v1.disable_eager_execution()  # Disable eager execution
 
     with tf.Graph().as_default():
@@ -83,8 +86,9 @@ def getEmbeddings(music):
 
         # Load the first audio file
         waveform1, sample_rate1 = librosa.load(
-            music, sr=16000, mono=True, dtype=np.float32
+            current_song_filename, sr=16000, mono=True, dtype=np.float32
         )
+
         waveform_tensor1 = tf.convert_to_tensor(waveform1, dtype=tf.float32)
         embeddings1 = model(waveform_tensor1)
 
@@ -96,16 +100,15 @@ def getEmbeddings(music):
         print(embeddings1_np.shape)
 
         sub_embedding_size = 10
-        sub_embeddings1 = split_into_sub_embeddings(embeddings1_np, sub_embedding_size)
+        # sub_embeddings1 = split_into_sub_embeddings(embeddings1_np, sub_embedding_size)
 
-        print(len(sub_embeddings1))
-        print(json.dumps(sub_embeddings1[0].tolist()))
+        # print(len(sub_embeddings1))
 
-        return json.dumps(sub_embeddings1[0].tolist())
+        return embeddings1_np.tolist()
 
 
 def main():
-    getEmbeddings()
+    get_embeddings_and_calculate_similarity_with_prev_songs()
 
 
 if __name__ == "__main__":

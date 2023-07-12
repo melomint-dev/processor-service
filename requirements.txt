@@ -1,6 +1,12 @@
+uvicorn[standard]
 fastapi
+pymongo
+python-multipart
 tensorflow
+tensorflow-gpu
 tensorflow_hub
 numpy
 librosa
 sklearn
+python-dotenv
+ffmpeg

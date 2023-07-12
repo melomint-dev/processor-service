@@ -1,4 +1,6 @@
 from dotenv import load_dotenv
+import os
+from pathlib import Path
 
 load_dotenv(".env")
 
@@ -8,6 +10,8 @@ from fastapi import File, UploadFile
 from pymongo import MongoClient
 from db import db
 import bson
+from datetime import datetime
+
 
 app = FastAPI()
 
@@ -19,23 +23,37 @@ def read_root():
     return {"Hello": "server is running successfully"}
 
 
+# create music directory to store tenporary music files
+Path("./music").mkdir(parents=True, exist_ok=True)
+
+
 @app.post("/embeddings")
 def upload(file: UploadFile = File(...), song_id: str = None):
     try:
         contents = file.file.read()
-        with open("./music/" + file.filename, "wb") as f:
+        filename = "./music/" + file.filename
+        with open(filename, "wb") as f:
             f.write(contents)
 
-        music_embeddings = embeddings.getEmbeddings(file.filename)
+        # get all songs wiht oldest first order
+        all_songs = db.songs.find().sort("created_at", 1)
+        music_embeddings = (
+            embeddings.get_embeddings_and_calculate_similarity_with_prev_songs(
+                filename, all_songs
+            )
+        )
 
         # Save Embeddings to DB
         db.songs.insert_one(
             {
                 "song_id": song_id,
-                # convert numpy array to 2d array
                 "embeddings": music_embeddings,
+                "created_at": datetime.now(),
             }
         )
+
+        # delete the file
+        # os.remove(filename)
 
         return {
             "message": f"Successfully uploaded {file.filename}",

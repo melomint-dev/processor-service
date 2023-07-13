@@ -47,7 +47,12 @@ class ResponseData(BaseModel):
 
 
 @app.post("/embeddings", response_model=ResponseData)
-def upload(file: UploadFile = File(...), song_id: str = None):
+def upload(
+    file: UploadFile = File(...),
+    song_id: str = None,
+    ifps_hash: str = None,
+    artist_id: str = None,
+):
     try:
         # Check if the file is an audio file
         file_type = file.content_type
@@ -89,6 +94,8 @@ def upload(file: UploadFile = File(...), song_id: str = None):
                 "$set": {
                     "embeddings": music_info["embeddings"],
                     "updated_at": datetime.now(),
+                    "ifps_hash": ifps_hash,
+                    "artist_id": artist_id,
                 },
                 "$setOnInsert": {
                     "created_at": datetime.now(),

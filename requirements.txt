@@ -9,3 +9,4 @@ librosa
 sklearn
 python-dotenv
 ffmpeg
+imghdr

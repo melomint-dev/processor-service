@@ -49,10 +49,26 @@ class ResponseData(BaseModel):
 @app.post("/embeddings", response_model=ResponseData)
 def upload(file: UploadFile = File(...), song_id: str = None):
     try:
-        contents = file.file.read()
-        filename = "./music/" + file.filename
+        # Check if the file is an audio file
+        file_type = file.content_type
+        if file_type.split("/")[0] != "audio":
+            return {
+                "message": "upload failed",
+                "status_code": 400,
+                "error": "The uploaded file is not a valid audio file.",
+            }
+
+        # Reset file cursor to read the file again
+        file.file.seek(0)
+
+        # Convert music files to WAV format
+        if not file.filename.lower().endswith(".wav"):
+            filename = "./music/" + file.filename.rsplit(".", 1)[0] + ".wav"
+        else:
+            filename = "./music/" + file.filename
+
         with open(filename, "wb") as f:
-            f.write(contents)
+            f.write(file.file.read())
 
         # get all songs wiht oldest first order except the song which is being uploaded
         all_songs = db.songs.find(

@@ -96,6 +96,13 @@ def upload(
                     "updated_at": datetime.now(),
                     "ifps_hash": ifps_hash,
                     "artist_id": artist_id,
+                    "similarity_scores": music_info["similarity_scores"],
+                    "similarity_scores_song_ids": music_info[
+                        "similarity_scores_song_ids"
+                    ],
+                    "similarity_scores_song_embedding_keys": music_info[
+                        "similarity_scores_song_embedding_keys"
+                    ],
                 },
                 "$setOnInsert": {
                     "created_at": datetime.now(),

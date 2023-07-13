@@ -52,6 +52,7 @@ def upload(file: UploadFile = File(...), song_id: str = None):
         # Check if the file is an audio file
         file_type = file.content_type
         if file_type.split("/")[0] != "audio":
+            # return an error response if the uploaded file is not an audio file
             return {
                 "message": "upload failed",
                 "status_code": 400,
@@ -67,6 +68,7 @@ def upload(file: UploadFile = File(...), song_id: str = None):
         else:
             filename = "./music/" + file.filename
 
+        # Save the file in the music directory
         with open(filename, "wb") as f:
             f.write(file.file.read())
 
@@ -74,6 +76,8 @@ def upload(file: UploadFile = File(...), song_id: str = None):
         all_songs = db.songs.find(
             {"song_id": {"$ne": song_id}}, sort=[("created_at", 1)]
         )
+
+        # process the uploaded song
         music_info = embeddings.get_embeddings_and_calculate_similarity_with_prev_songs(
             filename, all_songs
         )
@@ -96,6 +100,7 @@ def upload(file: UploadFile = File(...), song_id: str = None):
         # delete the file
         os.remove(filename)
 
+        # generate and return the response
         response = ResponseData(
             message=f"Successfully uploaded {file.filename}",
             status_code=200,

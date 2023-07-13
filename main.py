@@ -54,19 +54,27 @@ def upload(file: UploadFile = File(...), song_id: str = None):
         with open(filename, "wb") as f:
             f.write(contents)
 
-        # get all songs wiht oldest first order
-        all_songs = db.songs.find().sort("created_at", 1)
+        # get all songs wiht oldest first order except the song which is being uploaded
+        all_songs = db.songs.find(
+            {"song_id": {"$ne": song_id}}, sort=[("created_at", 1)]
+        )
         music_info = embeddings.get_embeddings_and_calculate_similarity_with_prev_songs(
             filename, all_songs
         )
 
         # Save Embeddings to DB
-        db.songs.insert_one(
+        db.songs.find_one_and_update(
+            {"song_id": song_id},
             {
-                "song_id": song_id,
-                "embeddings": music_info["embeddings"],
-                "created_at": datetime.now(),
-            }
+                "$set": {
+                    "embeddings": music_info["embeddings"],
+                    "updated_at": datetime.now(),
+                },
+                "$setOnInsert": {
+                    "created_at": datetime.now(),
+                },
+            },
+            upsert=True,
         )
 
         # delete the file
@@ -93,7 +101,7 @@ def upload(file: UploadFile = File(...), song_id: str = None):
         return {
             "message": "There was an error uploading the file",
             "status_code": 400,
-            "error": str(e),
+            "error": str(f"{type(e).__name__} - {e}"),
         }
     finally:
         file.file.close()

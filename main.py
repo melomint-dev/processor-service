@@ -47,7 +47,7 @@ class ResponseData(BaseModel):
         super().__init__(**data)
 
 
-@app.post("/embeddings", response_model=ResponseData)
+@app.post("/embeddings")
 def upload(
     file: UploadFile = File(...),
     song_id: str = None,
@@ -116,18 +116,18 @@ def upload(
         os.remove(filename)
 
         # generate and return the response
-        response = ResponseData(
-            message=f"Successfully uploaded {file.filename}",
-            status_code=200,
-            error=None,
-            similarity_scores=music_info["similarity_scores"],
-            similarity_scores_song_ids=music_info["similarity_scores_song_ids"],
-            similarity_scores_song_embedding_keys=music_info[
+        response = {
+            "message": f"Successfully uploaded {file.filename}",
+            "status_code": 200,
+            "error": None,
+            "similarity_scores": music_info["similarity_scores"],
+            "similarity_scores_song_ids": music_info["similarity_scores_song_ids"],
+            "similarity_scores_song_embedding_keys": music_info[
                 "similarity_scores_song_embedding_keys"
             ],
             # embeddings=music_info["embeddings"],
-            song_id=song_id,
-        )
+            "song_id": song_id,
+        }
 
         return response
 

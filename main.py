@@ -137,7 +137,6 @@ def upload(
     except Exception as e:
         traceback.print_exc()
         # Handle the exception and print its details
-        print(e)
         print(f"An exception occurred: {type(e).__name__} - {e}")
         return {
             "message": "There was an error uploading the file",

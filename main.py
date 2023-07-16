@@ -55,6 +55,14 @@ def upload(
     artist_id: str = None,
 ):
     try:
+        # check if all the required parameters are passed
+        if song_id is None or ifps_hash is None or artist_id is None:
+            return {
+                "message": "upload failed",
+                "status_code": 400,
+                "error": "Please Add All required Params.",
+            }
+
         # Check if the file is an audio file
         file_type = file.content_type
         if file_type.split("/")[0] != "audio":
@@ -119,7 +127,6 @@ def upload(
         response = {
             "message": f"Successfully uploaded {file.filename}",
             "status_code": 200,
-            "error": None,
             "similarity_scores": music_info["similarity_scores"],
             "similarity_scores_song_ids": music_info["similarity_scores_song_ids"],
             "similarity_scores_song_embedding_keys": music_info[

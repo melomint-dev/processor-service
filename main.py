@@ -116,9 +116,6 @@ def upload(
         os.remove(filename)
 
         # generate and return the response
-        print(music_info["similarity_scores"])
-        print(music_info["similarity_scores_song_ids"])
-        print(music_info["similarity_scores_song_embedding_keys"])
         response = ResponseData(
             message=f"Successfully uploaded {file.filename}",
             status_code=200,

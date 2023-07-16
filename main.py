@@ -1,4 +1,5 @@
 from dotenv import load_dotenv
+import traceback
 
 load_dotenv(".env")
 
@@ -131,6 +132,7 @@ def upload(
         return response
 
     except Exception as e:
+        traceback.print_exc()
         # Handle the exception and print its details
         print(e)
         print(f"An exception occurred: {type(e).__name__} - {e}")
